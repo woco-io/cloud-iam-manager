@@ -22,39 +22,27 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Get next version and build Docker images
+      - name: Get the latest tag and build Docker images
         run: |
           repoName="wocoio"
-          services="cloud-iam-manager"
+          service="cloud-iam-manager"
           
-          # Authenticate with Docker Hub and get the token
-          DOCKER_TOKEN=$(curl -s -H "Content-Type: application/json" -X POST -d '{"username": "'${{ secrets.DOCKER_USERNAME }}'", "password": "'${{ secrets.DOCKER_PASSWORD }}'"}' https://hub.docker.com/v2/users/login/ | jq -r .token)
+          # Get the latest tag for the service from Docker Hub
+          latest_tag=$(docker pull ${repoName}/${service}:latest > /dev/null 2>&1; \
+            docker images --format "{{.Tag}}" ${repoName}/${service} | sort -rV | head -n 1)
           
-          tag="1.0.0"  # Default starting tag
+          # If no tag exists, start from the default version
+          if [ -z "$latest_tag" ]; then
+            latest_tag="1.0.0"
+          fi
           
-          for service in ${services}; do
-            # Get current tags for the service
-            results=$(curl https://hub.docker.com/v2/repositories/${repoName}/${service}/tags -H "Authorization: JWT ${DOCKER_TOKEN}")
-            if [[ ${results} != *unauthorized* ]]; then
-              # Extract tag names from the JSON response using the corrected jq syntax
-              tags=$(echo ${results} | jq -r '.results[].name')
+          # Increment the tag version
+          major=$(echo $latest_tag | cut -d '.' -f 1)
+          minor=$(echo $latest_tag | cut -d '.' -f 2)
+          service_new_tag="${major}.$((minor+1)).0"
           
-              service_new_tag=${tag}
+          echo "Service new tag: $service_new_tag"
           
-              # Sort tags and get the latest tag
-              service_tags=$(echo ${tags} | sed 's/"//g' | sort -rV)
-              if [[ ! (-z ${service_tags}) ]]; then
-                service_latest_tag=$(echo ${service_tags} | head -n 1)
-                service_new_tag=$(echo ${service_latest_tag} | awk -F'.' '{print $1 "." ($2+1) "." 0}')
-              fi
-            else
-              echo "Error: Unauthorized access to Docker Hub"
-              exit 123
-            fi
-          
-            echo "service_new_tag = ${service_new_tag}"
-          
-            # Build and push the Docker image
-            docker build -t ${repoName}/${service}:${service_new_tag} .
-            docker push ${repoName}/${service}:${service_new_tag}
-          done
+          # Build and push the Docker image
+          docker build -t ${repoName}/${service}:${service_new_tag} .
+          docker push ${repoName}/${service}:${service_new_tag}
