@@ -71,6 +71,8 @@ app-conf:
     liveness:
       k8s-client:
         include: ${APP_HEALTH_LIVE_INCLUDE_K8S_CLIENT:true}
+  runners:
+    polling-interval: ${APP_RUNNERS_POLLING_INTERVAL:10000}
   k8s-config:
     namespace-label: ${APP_CLOUD_IAM_MANAGER_NS_LABEL:cloud-iam-manager.woco.io/enabled=true}
     eventTimingMinusHours: ${APP_CLOUD_IAM_MANAGER_EVENT_TIMING_MINUS_HOURS:0}
@@ -128,18 +130,19 @@ logging:
 
 The `cloud-iam-manager` service can be configured through environment variables. These environment variables override the corresponding values in the `application.yaml` configuration file. Below are the environment variables that can be set:
 
-| Environment Variable                            | Description                                                                                             | Default Value                          |
-|-------------------------------------------------|---------------------------------------------------------------------------------------------------------|----------------------------------------|
-| `APP_SERVER_PORT`                               | Port on which the service will run.                                                                     | `5000`                                 |
-| `APP_HEALTH_LIVE_INCLUDE_K8S_CLIENT`            | Include custom Kubernetes client liveness checks.                                                       | `true`                                 |
-| `APP_CLOUD_IAM_MANAGER_NS_LABEL`                  | Label used to filter Kubernetes namespaces for the service to operate in, use "all" for all namespaces. | `cloud-iam-manager.woco.io/enabled=true` |
-| `APP_CLOUD_IAM_MANAGER_EVENT_TIMING_MINUS_HOURS`  | Adjust event timing (in hours) for the service.                                                         | `0`                                    |
-| `APP_CLOUD_IAM_MANAGER_SA_IAM_ANNOTATION`         | Annotation key used to identify the Kubernetes Service Accounts to bind.                                | `iam.gke.io/gcp-service-account`       |
-| `APP_CLOUD_IAM_MANAGER_CLOUD_PROVIDER`            | The cloud provider (supports GCP).                                                                      | `GCP`                                  |
-| `APP_CLOUD_IAM_MANAGER_IAM_BINDING_ROLE`          | IAM role used when binding the Google Service Account to the Kubernetes Service Account.                | `iam.workloadIdentityUser`             |
-| `APP_GCP_PROJECT_ID`                            | Google Cloud Project ID to be used for the GSA binding.                                                 | null                                   |
-| `APP_CLOUD_IAM_MANAGER_IS_PRESERVE_IAM_BINDINGS`  | Whether to preserve IAM bindings.                                                                       | `true`                                 |
-| `APP_IS_USE_CACHE`                              | Whether to enable cache usage.                                                                          | `true`                                 |
+| Environment Variable                             | Description                                                                                             | Default Value                            |
+|--------------------------------------------------|---------------------------------------------------------------------------------------------------------|------------------------------------------|
+| `APP_SERVER_PORT`                                | Port on which the service will run.                                                                     | `5000`                                   |
+| `APP_HEALTH_LIVE_INCLUDE_K8S_CLIENT`             | Include custom Kubernetes client liveness checks.                                                       | `true`                                   |
+| `APP_RUNNERS_POLLING_INTERVAL`                   | Polling runner interval.                                                                                | `10000`                                  |
+| `APP_CLOUD_IAM_MANAGER_NS_LABEL`                 | Label used to filter Kubernetes namespaces for the service to operate in, use "all" for all namespaces. | `cloud-iam-manager.woco.io/enabled=true` |
+| `APP_CLOUD_IAM_MANAGER_EVENT_TIMING_MINUS_HOURS` | Adjust event timing (in hours) for the service.                                                         | `0`                                      |
+| `APP_CLOUD_IAM_MANAGER_SA_IAM_ANNOTATION`        | Annotation key used to identify the Kubernetes Service Accounts to bind.                                | `iam.gke.io/gcp-service-account`         |
+| `APP_CLOUD_IAM_MANAGER_CLOUD_PROVIDER`           | The cloud provider (supports GCP).                                                                      | `GCP`                                    |
+| `APP_CLOUD_IAM_MANAGER_IAM_BINDING_ROLE`         | IAM role used when binding the Google Service Account to the Kubernetes Service Account.                | `iam.workloadIdentityUser`               |
+| `APP_GCP_PROJECT_ID`                             | Google Cloud Project ID to be used for the GSA binding.                                                 | null                                     |
+| `APP_CLOUD_IAM_MANAGER_IS_PRESERVE_IAM_BINDINGS` | Whether to preserve IAM bindings.                                                                       | `true`                                   |
+| `APP_IS_USE_CACHE`                               | Whether to enable cache usage.                                                                          | `true`                                   |
 
 ---
 
