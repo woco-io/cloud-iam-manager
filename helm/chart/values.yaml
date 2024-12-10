@@ -1,0 +1,37 @@
+isAutomaticPermissions: true
+
+app:
+  name: cloud-iam-manager
+  image:
+    name: wocoio/cloud-iam-manager
+    tag: "1.0.0"
+    pullPolicy: IfNotPresent
+  port: 5000
+  env: {}
+    # APP_SERVER_PORT: 5000 # optional, port on which the service will start.
+    # APP_HEALTH_LIVE_INCLUDE_K8S_CLIENT: true # optional, whether to include k8s client in health check or not.
+    # APP_CLOUD_IAM_MANAGER_NS_LABEL: cloud-iam-manager.woco.io/enabled=true # optional, label to set on namespaces so the service will "watch" them, use "all" for all namespaces in cluster.
+    # APP_CLOUD_IAM_MANAGER_EVENT_TIMING_MINUS_HOURS: 0 # optional, hours to subtract from event timing in case of timezone diffrence between nodes and server.
+    # APP_CLOUD_IAM_MANAGER_SA_IAM_ANNOTATION: iam.gke.io/gcp-service-account #optional, annotation to identify K8S services by, this is used for both identification of service accounts and binding.
+    # APP_CLOUD_IAM_MANAGER_CLOUD_PROVIDER: GCP # optional, cloud provider to init on startup, all capital, case sensitive, allowed values: [GCP].
+    # APP_CLOUD_IAM_MANAGER_IAM_BINDING_ROLE: iam.workloadIdentityUser # optional, the role to bind between GSA and KSA.
+    # APP_CLOUD_IAM_MANAGER_IS_PRESERVE_IAM_BINDINGS: true # optional, whether to preserve previous bindings of GSA or remove them.
+    # APP_IS_USE_CACHE: true # optional, whether to use cache when scanning KSA, setting it to "false" is NOT recommended.
+    # ROOT_LOG_LEVEL: INFO # optional, entire service (including framework) log level, root logs might spam, changing "APP_LOG_LEVEL" is recommended.
+    # APP_LOG_LEVEL: INFO # optional, custom service logs which should be enough for 99% of the times.
+    # APP_GCP_PROJECT_ID: # required, the project id in which this service manages the GSA<->KSA binding.
+
+labels:
+  app: cloud-iam-manager
+annotations:
+  app: cloud-iam-manager
+
+strategy:
+  rollingUpdate:
+    maxSurge: 25%
+    maxUnavailable: 25%
+  type: RollingUpdate
+
+selector:
+  matchLabels:
+    app: cloud-iam-manager

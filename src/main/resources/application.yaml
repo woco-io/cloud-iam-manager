@@ -1,0 +1,49 @@
+server:
+  port: ${APP_SERVER_PORT:5000}
+
+app-conf:
+  health:
+    liveness:
+      k8s-client:
+        include: ${APP_HEALTH_LIVE_INCLUDE_K8S_CLIENT:true}
+  runners:
+    polling-interval: ${APP_RUNNERS_POLLING_INTERVAL:10000}
+  k8s-config:
+    namespace-label: ${APP_CLOUD_IAM_MANAGER_NS_LABEL:cloud-iam-manager.woco.io/enabled=true}
+    eventTimingMinusHours: ${APP_CLOUD_IAM_MANAGER_EVENT_TIMING_MINUS_HOURS:0}
+    service-account-iam-annotation: ${APP_CLOUD_IAM_MANAGER_SA_IAM_ANNOTATION:iam.gke.io/gcp-service-account}
+  cloud-config:
+    cloud-provider: ${APP_CLOUD_IAM_MANAGER_CLOUD_PROVIDER:GCP}
+    iam-binding-role: ${APP_CLOUD_IAM_MANAGER_IAM_BINDING_ROLE:iam.workloadIdentityUser}
+    project-id: ${APP_GCP_PROJECT_ID}
+    is-preserve-iam-bindings: ${APP_CLOUD_IAM_MANAGER_IS_PRESERVE_IAM_BINDINGS:true}
+  global:
+    is-use-cache: ${APP_IS_USE_CACHE:true}
+
+management:
+  endpoint:
+    health:
+      group:
+        liveness:
+          include: livenessState, k8sClientCustomLivenessIndicator
+      show-components: always
+      show-details: always
+      probes:
+        enabled: true
+
+spring:
+  application:
+    name: cloud-iam-manager
+
+logging:
+  level:
+    root: ${ROOT_LOG_LEVEL:INFO}
+    io:
+      woco:
+        cloud_iam_manager: ${APP_LOG_LEVEL:INFO}
+
+springdoc:
+  api-docs:
+    path: /api/docs
+  swagger-ui:
+    path: /api/docs.html

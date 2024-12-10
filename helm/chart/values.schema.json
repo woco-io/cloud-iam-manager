@@ -1,0 +1,203 @@
+{
+    "$schema": "https://json-schema.org/draft-07/schema#",
+    "properties": {
+        "labels": {
+            "type": "object",
+            "description": "Labels for all the resources created by this chart"
+        },
+        "annotations": {
+            "type": "object",
+            "description": "Annotations for all the resources created by this chart"
+        },
+        "replicas": {
+            "type": "number",
+            "description": "Amount of replicas to deploy",
+            "minimum": 0
+        },
+        "strategy": {
+            "type": "object",
+            "description": "Strategy configurations for the service deployment object"
+        },
+        "selector": {
+            "type": "object",
+            "description": "Selector configurations for the service deployment object"
+        },
+        "initContainers": {
+            "type": "object",
+            "description": "Init Containers configurations for the service deployment object"
+        },
+        "app": {
+            "type": "object",
+            "description": "Service configurations",
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "port": {
+                    "type": "number",
+                    "description": "Port will be used for service and healthchecks",
+                    "minimum": 1000
+                },
+                "image": {
+                    "type": "object",
+                    "description": "Service Container Image",
+                    "properties": {
+                        "name": {
+                            "type": "string"
+                        },
+                        "tag": {
+                            "type": "string"
+                        },
+                        "pullPolicy": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "env": {
+                    "type": "object",
+                    "description": "Service Environment variables"
+                },
+                "liveness": {
+                    "type": "object",
+                    "description": "Service Liveness probe configurations",
+                    "properties": {
+                        "path": {
+                            "type": "string",
+                            "description": "Service liveness probe path"
+                        },
+                        "port": {
+                            "type": "number",
+                            "description": "Service liveness probe port"
+                        },
+                        "delay": {
+                            "type": "number",
+                            "description": "Service liveness probe initial delay"
+                        },
+                        "period": {
+                            "type": "number",
+                            "description": "Service liveness probe interval period"
+                        }
+                    }
+                },
+                "readiness": {
+                    "type": "object",
+                    "description": "Service Readiness probe configurations",
+                    "properties": {
+                        "path": {
+                            "type": "string",
+                            "description": "Service readiness probe path"
+                        },
+                        "port": {
+                            "type": "number",
+                            "description": "Service readiness probe port"
+                        },
+                        "delay": {
+                            "type": "number",
+                            "description": "Service readiness probe initial delay"
+                        },
+                        "period": {
+                            "type": "number",
+                            "description": "Service readiness probe interval period"
+                        }
+                    }
+                },
+                "lifecycle": {
+                    "type": "object",
+                    "description": "Service Lifecycle configurations"
+                },
+                "resources": {
+                    "type": "object",
+                    "description": "Service Resources configurations",
+                    "properties": {
+                        "requests": {
+                            "type": "object",
+                            "description": "Service Resources requests",
+                            "properties": {
+                                "memory": {
+                                    "type": "string",
+                                    "description": "Service minimum memory (guaranteed)"
+                                },
+                                "cpu": {
+                                    "type": "string",
+                                    "description": "Service minimum cpu (guaranteed)"
+                                }
+                            }
+                        },
+                        "limits": {
+                            "type": "object",
+                            "description": "Service Resources limits",
+                            "properties": {
+                                "memory": {
+                                    "type": "string",
+                                    "description": "Service maximum memory"
+                                },
+                                "cpu": {
+                                    "type": "string",
+                                    "description": "Service maximum cpu"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "imagePullSecrets": {
+            "type": "array",
+            "description": "Secrets to use for pulling images"
+        },
+        "nodeSelector": {
+            "type": "object",
+            "description": "Control pod scheduling by selecting nodes based on labels"
+        },
+        "affinity": {
+            "type": "object",
+            "description": "Determines which nodes a pod can be scheduled on based on node labels"
+        },
+        "tolerations": {
+            "type": "object",
+            "description": "Pods will be scheduled on nodes with matching taints"
+        },
+        "securityContext": {
+            "type": "object",
+            "description": "Set of security-related settings that can be applied to a pod"
+        },
+        "restartPolicy": {
+            "type": "string",
+            "description": "Defines how the kubelet should handle pod restarts when containers within the pod fail"
+        },
+        "hostNetwork": {
+            "type": "string",
+            "description": "Whether a pod should use the network namespace of the host node instead of its own isolated network namespace"
+        },
+        "dnsPolicy": {
+            "type": "string",
+            "description": "Determines how DNS is configured for a pod and how the pod resolves DNS queries"
+        },
+        "serviceAccountName": {
+            "type": "string",
+            "description": "Specifies the name of the ServiceAccount that the pod should use for accessing the Kubernetes API and other resources with specific permissions"
+        },
+        "isAutomaticPermissions": {
+            "type": "boolean",
+            "description": "Whether to create service permissions (RBAC) and service account (K8S) automatically"
+        },
+        "gcpServiceAccount": {
+            "type": "string",
+            "description": "Service GSA to use for API calls against GCP"
+        },
+        "gcpProjectId": {
+            "type": "string",
+            "description": "GCP project id where this service will be deployed"
+        },
+        "createNamespace": {
+            "type": "string",
+            "description": "Whether to create namespace for the service or not"
+        }
+    },
+    "required": [
+        "gcpServiceAccount",
+        "gcpProjectId"
+    ],
+    "title": "Values",
+    "type": "object"
+}
