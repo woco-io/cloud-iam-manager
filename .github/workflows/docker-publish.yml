@@ -1,0 +1,59 @@
+name: Docker Publish
+
+on:
+  push:
+    branches:
+      - main  # Trigger when changes are pushed to the main branch
+
+jobs:
+  build_and_deploy:
+    runs-on: ubuntu-latest  # Use Ubuntu runner for your job
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Get next version and build Docker images
+        run: |
+          repoName="wocoio"
+          services="cloud-iam-manager"
+          
+          # Authenticate with Docker Hub and get the token
+          DOCKER_TOKEN=$(curl -s -H "Content-Type: application/json" -X POST -d '{"username": "'${{ secrets.DOCKER_USERNAME }}'", "password": "'${{ secrets.DOCKER_PASSWORD }}'"}' https://hub.docker.com/v2/users/login/ | jq -r .token)
+          
+          tag="1.0.0"  # Default starting tag
+          
+          for service in ${services}; do
+            # Get current tags for the service
+            results=$(curl https://hub.docker.com/v2/repositories/${repoName}/${service}/tags -H "Authorization: JWT ${DOCKER_TOKEN}")
+            if [[ ${results} != *unauthorized* ]]; then
+              tags=$(echo ${results} | jq .results.[].name)
+          
+              service_new_tag=${tag}
+          
+              # Sort tags and get the latest tag
+              service_tags=$(echo ${tags} | sed 's/"//g' | sort -rV)
+              if [[ ! (-z ${service_tags}) ]]; then
+                service_latest_tag=$(echo ${service_tags} | head -n 1)
+                service_new_tag=$(echo ${service_latest_tag} | awk -F'.' '{print $1 "." ($2+1) "." 0}')
+              fi
+            else
+              echo "Error: Unauthorized access to Docker Hub"
+              exit 123
+            fi
+          
+            echo "service_new_tag = ${service_new_tag}"
+          
+            # Build and push the Docker image
+            docker build -t ${repoName}/${service}:${service_new_tag} .
+            docker push ${repoName}/${service}:${service_new_tag}
+          done
