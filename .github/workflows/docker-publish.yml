@@ -36,7 +36,8 @@ jobs:
             # Get current tags for the service
             results=$(curl https://hub.docker.com/v2/repositories/${repoName}/${service}/tags -H "Authorization: JWT ${DOCKER_TOKEN}")
             if [[ ${results} != *unauthorized* ]]; then
-              tags=$(echo ${results} | jq .results.[].name)
+              # Extract tag names from the JSON response using the corrected jq syntax
+              tags=$(echo ${results} | jq -r '.results[].name')
           
               service_new_tag=${tag}
           
